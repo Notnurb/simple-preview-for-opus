@@ -3,19 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Photo</title>
+  <title>Photo Preview</title>
   <style>
     /* Make the image fill the window while preserving aspect ratio */
     html, body {
       height: 100%;
       margin: 0;
       background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
     .wrap {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100%;
+      padding: 1rem;
+      box-sizing: border-box;
+      text-align: center;
     }
     img {
       max-width: 100%;
@@ -23,12 +28,43 @@
       object-fit: contain;
       display: block;
     }
+    .fallback {
+      display: none;
+      font-size: 0.95rem;
+    }
+    .fallback a {
+      color: #9cf;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <!-- Save the uploaded image as "photo.png" next to this file -->
-    <img src="photo.png" alt="Photo">
+    <!-- We set the image src from JavaScript using a path relative to the current document.
+         This ensures the browser will look for "photo.png" in the same directory as this HTML file. -->
+    <img id="photo" alt="Photo preview">
+    <div id="fallback" class="fallback">
+      Could not load <code>photo.png</code>. You can open it directly:
+      <span id="fallback-link"></span>
+    </div>
   </div>
+
+  <script>
+    (function () {
+      // Resolve photo.png relative to the current document location (works for file://, hosted, etc.)
+      const photoUrl = new URL('photo.png', location.href).href;
+      const img = document.getElementById('photo');
+      const fallback = document.getElementById('fallback');
+      const fallbackLink = document.getElementById('fallback-link');
+
+      img.src = photoUrl;
+
+      img.addEventListener('error', function () {
+        // Show a helpful fallback link when the image can't be loaded
+        fallback.style.display = 'block';
+        fallbackLink.innerHTML = '<a href="' + photoUrl + '" target="_blank" rel="noopener noreferrer">Open photo.png</a>';
+      });
+    })();
+  </script>
 </body>
 </html>
